@@ -1,0 +1,86 @@
+‏<!DOCTYPE html>
+‏<html lang="ar">
+‏<head>
+‏    <meta charset="UTF-8">
+‏    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+‏    <title>مدير كلمات السر</title>
+‏    <style>
+‏        body { font-family: Arial, sans-serif; margin: 20px; }
+‏        input { margin: 5px; }
+‏        #strength { margin-top: 10px; }
+‏        .weak { color: red; }
+‏        .medium { color: orange; }
+‏        .strong { color: green; }
+‏        #passwords { margin-top: 20px; }
+‏    </style>
+‏</head>
+‏<body>
+‏    <h1>مدير كلمات السر</h1>
+‏    <input type="text" id="password" placeholder="أدخل كلمة المرور" />
+‏    <button onclick="addPassword()">إضافة كلمة المرور</button>
+‏    <div id="strength"></div>
+‏    <h2>كلمات السر المخزنة:</h2>
+‏    <div id="passwords"></div>
+
+‏    <script>
+‏        function checkPasswordStrength(password) {
+‏            let strength = "ضعيف";
+‏            const lengthCheck = password.length >= 8;
+‏            const numberCheck = /[0-9]/.test(password);
+‏            const upperCheck = /[A-Z]/.test(password);
+‏            const lowerCheck = /[a-z]/.test(password);
+‏            const specialCheck = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            
+‏            if (lengthCheck && (numberCheck + upperCheck + lowerCheck + specialCheck) >= 3) {
+‏                strength = "قوي";
+‏            } else if (lengthCheck) {
+‏                strength = "متوسط";
+            }
+
+‏            return strength;
+        }
+
+‏        function addPassword() {
+‏            const passwordInput = document.getElementById("password");
+‏            const password = passwordInput.value;
+‏            const strengthDisplay = document.getElementById("strength");
+‏            const passwordList = document.getElementById("passwords");
+
+‏            if (password) {
+‏                const strength = checkPasswordStrength(password);
+‏                strengthDisplay.innerHTML = `قوة كلمة المرور: <span class="${strength === 'ضعيف' ? 'weak' : strength === 'متوسط' ? 'medium' : 'strong'}">${strength}</span>`;
+                
+                // إضافة كلمة المرور إلى القائمة وعرضها
+‏                const passwordItem = document.createElement("div");
+‏                passwordItem.textContent = password;
+‏                passwordList.appendChild(passwordItem);
+
+                // تخزين كلمات المرور في localStorage
+‏                storePassword(password);
+‏                passwordInput.value = '';
+            }
+        }
+
+‏        function storePassword(password) {
+‏            let passwords = JSON.parse(localStorage.getItem('passwords')) || [];
+‏            passwords.push(password);
+‏            localStorage.setItem('passwords', JSON.stringify(passwords));
+‏            displayPasswords();
+        }
+
+‏        function displayPasswords() {
+‏            const passwordList = document.getElementById("passwords");
+‏            passwordList.innerHTML = ''; // مسح القائمة الحالية
+‏            const passwords = JSON.parse(localStorage.getItem('passwords')) || [];
+‏            passwords.forEach(password => {
+‏                const passwordItem = document.createElement("div");
+‏                passwordItem.textContent = password;
+‏                passwordList.appendChild(passwordItem);
+            });
+        }
+
+        // عرض كلمات المرور المخزنة عند تحميل الصفحة
+‏        window.onload = displayPasswords;
+‏    </script>
+‏</body>
+‏</html>
